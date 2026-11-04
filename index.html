@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+        .player-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        #playBtn {
+            background-color: #10b981;
+        }
+        #restartBtn {
+            background-color: #3b82f6;
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="player-card">
+        <h2>Audio1 Player</h2>
+        <!-- No controls attribute added to prevent native pausing -->
+        <audio id="myAudio" src="audio1.mp3"></audio>
+        
+        <div class="controls">
+            <button id="playBtn">Play</button>
+            <button id="restartBtn">Restart</button>
+        </div>
+        <div class="status" id="timeDisplay">0:00</div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('myAudio');
+        const playBtn = document.getElementById('playBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const timeDisplay = document.getElementById('timeDisplay');
+        
+        const storageKey = 'audio1_saved_progress';
+
+        // Format time in seconds to M:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Restore saved time when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTime = localStorage.getItem(storageKey);
+            if (savedTime) {
+                audio.currentTime = parseFloat(savedTime);
+                timeDisplay.textContent = `Resumed from ${formatTime(audio.currentTime)}`;
+            }
+        });
+
+        // Save progress to localStorage continuously as it plays
+        audio.addEventListener('timeupdate', () => {
+            localStorage.setItem(storageKey, audio.currentTime);
+            timeDisplay.textContent = formatTime(audio.currentTime);
+        });
+
+        // Play action
+        playBtn.addEventListener('click', () => {
+            audio.play();
+        });
+
+        // Restart action
+        restartBtn.addEventListener('click', () => {
+            audio.currentTime = 0;
+            localStorage.setItem(storageKey, 0);
+            audio.play(); // Automatically start playing upon restart
+        });
+    </script>
+</body>
+</html>
